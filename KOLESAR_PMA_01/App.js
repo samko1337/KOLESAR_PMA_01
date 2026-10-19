@@ -1,19 +1,32 @@
+
 import { StatusBar } from 'expo-status-bar';
-import {useState} from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button,
+  FlatList,
+} from 'react-native';
+
+import Item from './component/items';
 
 export default function App() {
   const [item, setItem] = useState('');
   const [task, setTask] = useState([]);
 
-
   function handleAddItem() {
-    setTask([...task, item]);
-    setItem('');
-  }
+    const newItem = item.trim();
 
-  function handleInputText(text) {
-    setItem(text);
+    if (newItem === '') return;
+
+    setTask((currentTasks) => [
+      ...currentTasks,
+      { id: Date.now().toString(), title: newItem },
+    ]);
+
+    setItem('');
   }
 
   return (
@@ -22,22 +35,28 @@ export default function App() {
 
       <View style={styles.inputContainer}>
         <TextInput
-          onChangeText={handleInputText}
+          value={item}
+          onChangeText={setItem}
           style={styles.input}
           placeholder="PROJEKT PMA"
         />
 
-        <Button title="ADD" onPress={() => console.log('ADD')} />
+        <Button title="ADD" onPress={handleAddItem} />
 
         <Text>UDALOST</Text>
       </View>
 
       <View style={styles.udalosti}>
-        task.map((i) => (
-        <Text>
-          ({i})
-
-        </Text>
+        <FlatList
+          data={task}
+          keyExtractor={(taskItem) => taskItem.id}
+          renderItem={({ item }) => (
+            <Item title={item.title} />
+          )}
+          ListEmptyComponent={
+            <Text>Zatiaľ žiadne udalosti.</Text>
+          }
+        />
       </View>
     </View>
   );
